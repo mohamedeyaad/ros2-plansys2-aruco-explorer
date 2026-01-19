@@ -24,8 +24,8 @@
   <!-- External File Includes                    -->
   <!-- ========================================= -->
   
-  <xacro:include filename="$(find aruco_nav_bot)/urdf/aruco_bot_diff.gazebo.xacro"/>
-  <xacro:include filename="$(find aruco_nav_bot)/urdf/materials.xacro"/>
+  <xacro:include filename="$(find arucobot_description)/urdf/aruco_bot_diff.gazebo.xacro"/>
+  <xacro:include filename="$(find arucobot_description)/urdf/materials.xacro"/>
 
   <!-- ========================================= -->
   <!-- Robot Geometry Parameters                 -->
