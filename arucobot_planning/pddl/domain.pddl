@@ -1,4 +1,4 @@
-(define (domain arucobot)
+(define (domain arucobot_domain)
   (:requirements :strips :typing :durative-actions)
 
   (:types
