@@ -47,6 +47,7 @@ The robot operates in a known environment with **4 predefined waypoints** and di
 | **`arucobot_perception`** | Python node for detecting ArUco markers using OpenCV and publishing detections. |
 | **`arucobot_navigation`** | Nav2 configuration (nav2_params.yaml), map files, and navigation launch scripts. |
 | **`arucobot_planning`** | PlanSys2 PDDL domain/problem files and Action Executors (move, survey, take_picture). |
+| **`aruco_interfaces`** | Custom message definitions for ArUco detections (e.g., marker ID and pose). |
 
 ---
 
@@ -64,7 +65,6 @@ sudo apt install ros-jazzy-navigation2 \
                  ros-jazzy-plansys2-bringup \
                  ros-jazzy-ros-gz-sim \
                  ros-jazzy-ros-gz-bridge \
-                 ros-jazzy-robot-localization \
                  ros-jazzy-cv-bridge \
                  python3-opencv \
                  python3-opencv-contrib
@@ -76,7 +76,7 @@ sudo apt install ros-jazzy-navigation2 \
 mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 # Clone this repository
-git clone https://github.com/mohamedeyaad/ros2-plansys2-aruco-explorer.git .
+git clone https://github.com/mohamedeyaad/ros2-plansys2-aruco-explorer.git
 
 cd ~/ros2_ws
 colcon build --symlink-install
@@ -214,7 +214,6 @@ The simulation includes:
   - 2D LiDAR (for localization and obstacle avoidance)
   - Odometry sensors
 - Pre-mapped environment (`maps/my_map.yaml`)
-- EKF-based odometry fusion (`config/ekf.yaml`)
 
 **Waypoint Locations:**
 - `wp1`: (-6.0, -6.0) containing Marker ID 3
@@ -233,7 +232,6 @@ The simulation includes:
 - **ArUco Detector**: `arucobot_perception/scripts/aruco_detector_node.py`
 - **Gazebo Bridge**: `arucobot_gazebo/config/ros_gz_bridge.yaml`
 - **Robot Model**: `arucobot_description/urdf/aruco_bot_diff.xacro`
-- **EKF Config**: `arucobot_gazebo/config/ekf.yaml`
 
 ---
 
@@ -274,7 +272,6 @@ graph TD
 - ✅ **Nav2 integration** for autonomous waypoint navigation
 - ✅ **PlanSys2 PDDL planning** with durative actions and state tracking
 - ✅ **Gazebo Harmonic simulation** with realistic robot and sensor models
-- ✅ **EKF localization** for accurate odometry and positioning
 - ✅ **Image processing capability** (camera-based marker interaction)
 
 ---
