@@ -17,6 +17,7 @@
 #include <cv_bridge/cv_bridge.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/aruco.hpp>
+#include <tf2/LinearMath/Quaternion.h>
 
 using namespace std::chrono_literals;
 
@@ -28,11 +29,11 @@ class MoveAction : public plansys2::ActionExecutorClient
 public:
   MoveAction() : plansys2::ActionExecutorClient("move", 500ms) {
     nav2_client_ = rclcpp_action::create_client<nav2_msgs::action::NavigateToPose>(this, "navigate_to_pose");
-    // Coordinates
-    waypoints_["wp1"] = {-6.0, -6.0, 3.14};
-    waypoints_["wp2"] = {-6.0,  6.0, 3.14};
-    waypoints_["wp3"] = { 6.0,  6.0, 3.14};
-    waypoints_["wp4"] = { 6.0, -6.0, 3.14};
+    // Coordinates with orientation (x, y, yaw_radians)
+    waypoints_["wp1"] = {-6.0, -6.0, 3.14}; // 180 degrees
+    waypoints_["wp2"] = {-6.0,  6.0, 1.57};  // 90 degrees
+    waypoints_["wp3"] = { 6.0, -6.0, -1.57}; // -90 degrees
+    waypoints_["wp4"] = { 6.0,  6.0, 0.0};  // 0 degrees
     waypoints_["wp_start"] = {0.0, 0.0, 0.0}; 
   }
 
@@ -57,7 +58,15 @@ public:
     goal_msg.pose.header.stamp = this->now();
     goal_msg.pose.pose.position.x = waypoints_[goal_wp][0];
     goal_msg.pose.pose.position.y = waypoints_[goal_wp][1];
-    goal_msg.pose.pose.orientation.w = 1.0;
+    
+    // Convert yaw (radians) to quaternion
+    double yaw = waypoints_[goal_wp][2];
+    tf2::Quaternion q;
+    q.setRPY(0, 0, yaw);  // Roll=0, Pitch=0, Yaw=specified
+    goal_msg.pose.pose.orientation.x = q.x();
+    goal_msg.pose.pose.orientation.y = q.y();
+    goal_msg.pose.pose.orientation.z = q.z();
+    goal_msg.pose.pose.orientation.w = q.w();
 
     auto send_goal_options = rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SendGoalOptions();
     send_goal_options.result_callback = [this](const rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::WrappedResult & result) {
