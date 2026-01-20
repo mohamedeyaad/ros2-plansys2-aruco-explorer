@@ -5,7 +5,36 @@
 ![Nav2](https://img.shields.io/badge/Navigation-Nav2-orange)
 ![License](https://img.shields.io/badge/License-Apache_2.0-lightgrey)
 
-An autonomous mobile robot capability demo that combines **PlanSys2 (PDDL planning)**, **Nav2 (Navigation)**, and **OpenCV (ArUco Perception)** in a Gazebo simulation. The robot executes a **two-phase mission**: first surveying all locations to detect ArUco markers, then returning to take high-quality pictures of each detected marker.
+An autonomous mobile robot system that combines **PlanSys2 (PDDL planning)**, **Nav2 (Navigation)**, and **OpenCV (ArUco Perception)** to autonomously detect and interact with ArUco markers. The robot executes a **two-phase mission**: first surveying all predefined waypoints to discover marker locations, then systematically visiting each detected marker in ascending ID order to capture images.
+
+---
+
+## 🎥 Demo Video
+
+[![ROS 2 PlanSys2 ArUco Explorer Demo](https://img.youtube.com/vi/UrN_7yXdufQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=UrN_7yXdufQ)
+
+**Watch the robot autonomously survey waypoints, detect ArUco markers, and capture images in marker ID order!**
+
+---
+
+## 📋 Mission Overview
+
+The robot operates in a known environment with **4 predefined waypoints** and discovers ArUco markers at these locations:
+
+| Waypoint | Coordinates | Marker ID |
+|----------|-------------|-----------|
+| **wp1** | (-6.0, -6.0) | 3 |
+| **wp2** | (-6.0, 6.0) | 0 |
+| **wp3** | (6.0, -6.0) | 2 |
+| **wp4** | (6.0, 6.0) | 1 |
+
+**Key Requirements:**
+- ✅ Visit all 4 waypoints during survey phase
+- ✅ Detect ArUco marker at each waypoint
+- ✅ Record marker ID and location mapping
+- ✅ Visit detected markers in **ascending ID order** (0 → 1 → 2 → 3)
+- ✅ Capture and modify images at each marker location
+- ✅ Use **PlanSys2** for mission planning and action coordination
 
 ---
 
@@ -47,7 +76,7 @@ sudo apt install ros-jazzy-navigation2 \
 mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 # Clone this repository
-git clone https://github.com/yourusername/ros2-plansys2-aruco-explorer.git .
+git clone https://github.com/mohamedeyaad/ros2-plansys2-aruco-explorer.git .
 
 cd ~/ros2_ws
 colcon build --symlink-install
@@ -63,21 +92,17 @@ source install/setup.bash
 The easiest way to run the complete mission is using the **Mission Controller**:
 
 ```bash
-# Terminal 1: Launch Gazebo simulation
-ros2 launch arucobot_gazebo simulation.launch.py
-
-# Terminal 2: Launch Navigation stack
+# Terminal 1: Launch Simulation + Navigation
 ros2 launch arucobot_navigation navigation.launch.py
 
-# Terminal 3: Start ArUco detector
+# Terminal 2: Start ArUco detector
 ros2 run arucobot_perception aruco_detector_node
 
-# Terminal 4: Launch PlanSys2 and action executors
+# Terminal 3: Launch PlanSys2 and action executors
 ros2 launch arucobot_planning planning.launch.py
 
-# Terminal 5: Run automated mission controller
-cd ~/ros2_ws/src/ros2-plansys2-aruco-explorer/arucobot_planning/scripts
-python3 mission_controller.py
+# Terminal 4: Run automated mission controller
+ros2 run arucobot_planning mission_controller.py
 ```
 
 ### Manual Control (Advanced)
@@ -99,8 +124,8 @@ run
 set goal (and (picture_taken wp1))
 run
 
-# Multiple goals
-set goal (and (surveyed wp1) (surveyed wp2) (picture_taken wp1))
+# Complete mission
+set goal (and (surveyed wp1) (surveyed wp2) (surveyed wp3) (surveyed wp4) (picture_taken wp1) (picture_taken wp2) (picture_taken wp3) (picture_taken wp4))
 run
 ```
 
@@ -112,30 +137,36 @@ run
 
 The mission controller implements an intelligent **explore-then-execute** workflow:
 
-#### **Phase 1: Survey (Exploration)**
-- Robot visits **all predefined waypoints** (wp1, wp2, wp3, wp4)
-- At each location, executes `survey` action to scan for ArUco markers
-- Records marker IDs and their corresponding waypoints
+#### **Phase 1: Survey (Marker Discovery)**
+- Robot sequentially visits all **4 waypoints** (wp1, wp2, wp3, wp4)
+- At each location, executes `survey` action to scan for ArUco markers using the camera
+- Records detected **marker ID** and its **waypoint location**
+- Only waypoints with detected markers are scheduled for Phase 2
 - Example output:
   ```
   --- STARTING PHASE 1: SURVEY ---
-  Surveying wp1... --> RECORDED: Marker ID 3 found at wp1
-  Surveying wp2... --> RECORDED: Marker ID 0 found at wp2
-  Surveying wp3... --> RECORDED: Marker ID 2 found at wp3
-  Surveying wp4... --> RECORDED: Marker ID 1 found at wp4
+  Moving to wp1... Survey wp1 --> MARKER DETECTED: ID 3
+  Moving to wp2... Survey wp2 --> MARKER DETECTED: ID 0
+  Moving to wp3... Survey wp3 --> MARKER DETECTED: ID 2
+  Moving to wp4... Survey wp4 --> MARKER DETECTED: ID 1
+  --- PHASE 1 COMPLETE ---
+  Discovered markers: {0: wp2, 1: wp4, 2: wp3, 3: wp1}
   ```
 
-#### **Phase 2: Execution (Task Completion)**
-- Robot returns to **only locations with detected markers**
-- Executes `take_picture` action to capture high-quality images
+#### **Phase 2: Execution (Lowest ID First)**
+- Robot visits **detected markers in ascending ID order**: ID 0 → 1 → 2 → 3
+- At each marker location, executes `take_picture` action to:
+  - Center on the detected marker
+  - Capture an image from the camera
+  - Apply image processing/modification
 - Example output:
   ```
   --- STARTING PHASE 2: EXECUTION ---
-  Targeting ID 0 at wp2 >>> ID 0 COMPLETED.
-  Targeting ID 1 at wp4 >>> ID 1 COMPLETED.
-  Targeting ID 2 at wp3 >>> ID 2 COMPLETED.
-  Targeting ID 3 at wp1 >>> ID 3 COMPLETED.
-  MISSION ACCOMPLISHED.
+  Processing ID 0: Moving to wp2... Taking picture at ID 0 COMPLETED
+  Processing ID 1: Moving to wp4... Taking picture at ID 1 COMPLETED
+  Processing ID 2: Moving to wp3... Taking picture at ID 2 COMPLETED
+  Processing ID 3: Moving to wp1... Taking picture at ID 3 COMPLETED
+  --- MISSION ACCOMPLISHED ---
   ```
 
 ### PDDL Domain (`domain.pddl`)
@@ -154,38 +185,42 @@ The robot operates using **three durative actions**:
 
 3. **`take_picture`**: Centers on detected marker and captures image.
    - *Duration:* 10 time units
-   - *Precondition:* Robot at waypoint `w`
-   - *Effect:* Picture taken at waypoint `w`
+   - *Precondition:* Robot at waypoint `w` where a marker was `surveyed`
+   - *Effect:* Picture `picture_taken` at waypoint `w`
 
 ### Action Executors
 
 Action executors are implemented in `arucobot_planning/src/`:
 
-- **`move_action_node.cpp`**: Interfaces with Nav2's `NavigateToPose` action
-- **`survey_action_node.cpp`**: Rotates robot 360° and monitors ArUco detections
-- **`take_picture_action_node.cpp`**: Centers on marker and triggers camera capture
+- **`move_action_node.cpp`**: Interfaces with Nav2's `NavigateToPose` action to move between waypoints
+- **`survey_action_node.cpp`**: Rotates robot 360° and monitors `/aruco_markers` topic for detections
+- **`take_picture_action_node.cpp`**: Subscribes to camera feed and processes detected markers
 
 ### Perception Pipeline
 
-The `aruco_detector_node.py` subscribes to `/camera/image_raw`, detects ArUco markers using OpenCV, and publishes on `aruco_markers`:
-- Detected marker IDs
-- Marker poses (3D position/orientation)
+The `aruco_detector_node.py` subscribes to `/camera/image_raw`, detects ArUco markers using OpenCV, and publishes on `/aruco_markers`:
+- Detected **marker IDs** (0-3)
+- Marker **3D poses** (position and orientation)
+- **Confidence scores** for each detection
 
 ---
 
 ## 🗺️ Gazebo World
 
 The simulation includes:
-- **ArUco World** (`aruco_world.world`) with 4 ArUco markers (IDs 0-3)
-- Differential drive robot with 2D LIDAR and RGB camera
+- **ArUco Environment** with 4 distinct ArUco markers (IDs 0, 1, 2, 3)
+- Differential drive robot equipped with:
+  - RGB camera (front-mounted for marker detection)
+  - 2D LiDAR (for localization and obstacle avoidance)
+  - Odometry sensors
 - Pre-mapped environment (`maps/my_map.yaml`)
 - EKF-based odometry fusion (`config/ekf.yaml`)
 
-**Waypoint-Marker Mapping:**
-- `wp1`: **Marker ID 3**
-- `wp2`: **Marker ID 0**
-- `wp3`: **Marker ID 2**
-- `wp4`: **Marker ID 1**
+**Waypoint Locations:**
+- `wp1`: (-6.0, -6.0) containing Marker ID 3
+- `wp2`: (-6.0, 6.0) containing Marker ID 0
+- `wp3`: (6.0, -6.0) containing Marker ID 2
+- `wp4`: (6.0, 6.0) containing Marker ID 1
 
 ---
 
@@ -195,7 +230,7 @@ The simulation includes:
 - **PDDL Domain**: `arucobot_planning/pddl/domain.pddl`
 - **PDDL Problem**: `arucobot_planning/pddl/problem.pddl`
 - **Mission Controller**: `arucobot_planning/scripts/mission_controller.py`
-- **ArUco Parameters**: `arucobot_perception/config/aruco_params.yaml`
+- **ArUco Detector**: `arucobot_perception/scripts/aruco_detector_node.py`
 - **Gazebo Bridge**: `arucobot_gazebo/config/ros_gz_bridge.yaml`
 - **Robot Model**: `arucobot_description/urdf/aruco_bot_diff.xacro`
 - **EKF Config**: `arucobot_gazebo/config/ekf.yaml`
@@ -206,38 +241,40 @@ The simulation includes:
 
 ```mermaid
 graph TD
-    A[Mission Start] --> B[Phase 1: Survey]
-    B --> C[Move to wp1]
-    C --> D[Survey wp1 - Found ID 3]
-    D --> E[Move to wp2]
-    E --> F[Survey wp2 - Found ID 0]
-    F --> G[Move to wp3]
-    G --> H[Survey wp3 - Found ID 2]
-    H --> I[Move to wp4]
-    I --> J[Survey wp4 - Found ID 1]
-    J --> K[Phase 2: Execution]
-    K --> L[Target ID 0 at wp2]
-    L --> M[Take Picture at wp2]
-    M --> N[Target ID 1 at wp4]
-    N --> O[Take Picture at wp4]
-    O --> P[Target ID 2 at wp3]
-    P --> Q[Take Picture at wp3]
-    Q --> R[Target ID 3 at wp1]
-    R --> S[Take Picture at wp1]
-    S --> T[Mission Accomplished]
+    A[Mission Start] --> B["Phase 1: Survey All Waypoints"]
+    B --> C["Move to wp1"]
+    C --> D["Survey wp1 - Detected Marker ID 3"]
+    D --> E["Move to wp2"]
+    E --> F["Survey wp2 - Detected Marker ID 0"]
+    F --> G["Move to wp3"]
+    G --> H["Survey wp3 - Detected Marker ID 2"]
+    H --> I["Move to wp4"]
+    I --> J["Survey wp4 - Detected Marker ID 1"]
+    J --> K["Sort by Marker ID"]
+    K --> L["Phase 2: Visit Markers by Lowest ID"]
+    L --> M["Target Marker ID 0 at wp2"]
+    M --> N["Take Picture at ID 0"]
+    N --> O["Target Marker ID 1 at wp4"]
+    O --> P["Take Picture at ID 1"]
+    P --> Q["Target Marker ID 2 at wp3"]
+    Q --> R["Take Picture at ID 2"]
+    R --> S["Target Marker ID 3 at wp1"]
+    S --> T["Take Picture at ID 3"]
+    T --> U["Mission Accomplished"]
 ```
 
 ---
 
 ## 🎯 Features
 
-- ✅ **Automated two-phase mission planning** (Survey → Execute)
-- ✅ **Dynamic waypoint graph** (defined in PDDL problem file)
-- ✅ **Real-time ArUco marker detection** (OpenCV 4.x with ArUco module)
-- ✅ **Nav2 integration** for autonomous navigation
-- ✅ **PlanSys2 task planning** with PDDL 2.1
-- ✅ **Gazebo Harmonic simulation** with realistic sensors
-- ✅ **EKF localization** for accurate positioning
-- ✅ **Intelligent marker tracking** (only revisits locations with detections)
+- ✅ **Autonomous two-phase mission** (Survey all waypoints → Execute by marker ID)
+- ✅ **Ascending ID priority** (visits markers in order: 0, 1, 2, 3)
+- ✅ **Real-time ArUco marker detection** (OpenCV with marker pose estimation)
+- ✅ **Dynamic marker discovery** (records location of each detected marker)
+- ✅ **Nav2 integration** for autonomous waypoint navigation
+- ✅ **PlanSys2 PDDL planning** with durative actions and state tracking
+- ✅ **Gazebo Harmonic simulation** with realistic robot and sensor models
+- ✅ **EKF localization** for accurate odometry and positioning
+- ✅ **Image processing capability** (camera-based marker interaction)
 
 ---
