@@ -7,9 +7,17 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(plansys2_executor REQUIRED)
+find_package(nav2_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(aruco_interfaces REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(OpenCV REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -23,9 +31,38 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+add_executable(move_action_node src/move_action_node.cpp)
+
+ament_target_dependencies(move_action_node
+  rclcpp
+  rclcpp_action
+  rclcpp_lifecycle
+  plansys2_executor
+  nav2_msgs
+  geometry_msgs
+  sensor_msgs
+  std_msgs
+  aruco_interfaces
+  cv_bridge
+)
+
+target_link_libraries(move_action_node
+  ${OpenCV_LIBRARIES}
+)
+
+install(TARGETS
+  move_action_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(
   DIRECTORY launch pddl config
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(
+  PROGRAMS scripts/mission_controller.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_package()
