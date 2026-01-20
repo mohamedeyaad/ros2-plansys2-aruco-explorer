@@ -12,7 +12,7 @@
 #include "geometry_msgs/msg/twist.hpp"
 #include "sensor_msgs/msg/image.hpp"
 #include "std_msgs/msg/int32.hpp" // New: To report ID
-#include "aruco_interfaces/msg/aruco_markers.hpp"
+#include "arucobot_interfaces/msg/aruco_markers.hpp"
 
 #include <cv_bridge/cv_bridge.hpp>
 #include <opencv2/opencv.hpp>
@@ -93,7 +93,7 @@ public:
     // Publish found ID to this topic
     id_pub_ = this->create_publisher<std_msgs::msg::Int32>("/found_id", 10); 
     
-    aruco_sub_ = this->create_subscription<aruco_interfaces::msg::ArucoMarkers>(
+    aruco_sub_ = this->create_subscription<arucobot_interfaces::msg::ArucoMarkers>(
       "/aruco_markers", rclcpp::SensorDataQoS(), 
       std::bind(&SurveyAction::aruco_callback, this, std::placeholders::_1));
   }
@@ -121,7 +121,7 @@ public:
     }
   }
 
-  void aruco_callback(const aruco_interfaces::msg::ArucoMarkers::SharedPtr msg) {
+  void aruco_callback(const arucobot_interfaces::msg::ArucoMarkers::SharedPtr msg) {
     if (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) return;
     if (msg->marker_ids.empty()) return;
 
@@ -147,7 +147,7 @@ public:
 private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
   rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr id_pub_;
-  rclcpp::Subscription<aruco_interfaces::msg::ArucoMarkers>::SharedPtr aruco_sub_;
+  rclcpp::Subscription<arucobot_interfaces::msg::ArucoMarkers>::SharedPtr aruco_sub_;
   rclcpp::Time start_time_;
 };
 
@@ -161,7 +161,7 @@ public:
     cmd_vel_pub_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
     processed_img_pub_ = this->create_publisher<sensor_msgs::msg::Image>("/modified_image", 10);
     
-    aruco_sub_ = this->create_subscription<aruco_interfaces::msg::ArucoMarkers>(
+    aruco_sub_ = this->create_subscription<arucobot_interfaces::msg::ArucoMarkers>(
       "/aruco_markers", rclcpp::SensorDataQoS(), 
       std::bind(&TakePictureAction::aruco_callback, this, std::placeholders::_1));
 
@@ -201,8 +201,7 @@ public:
           // 1. Convert ROS message to OpenCV Mat
           cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(last_image_msg_, sensor_msgs::image_encodings::BGR8);
                 
-          // 2. Setup ArUco Detector (C++ equivalent of your Python setup)
-          // Note: Ensure this dictionary matches what your robot uses (e.g. DICT_5X5_250, ORIGINAL, etc.)
+          // 2. Setup ArUco Detector
           auto dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_ARUCO_ORIGINAL);
           auto parameters = cv::aruco::DetectorParameters::create();
                 
@@ -245,7 +244,7 @@ public:
     }
   }
 
-  void aruco_callback(const aruco_interfaces::msg::ArucoMarkers::SharedPtr msg) {
+  void aruco_callback(const arucobot_interfaces::msg::ArucoMarkers::SharedPtr msg) {
     if (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) return;
     
     if (state_ == SCANNING) {
@@ -276,7 +275,7 @@ private:
   rclcpp::Time start_time_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr processed_img_pub_;
-  rclcpp::Subscription<aruco_interfaces::msg::ArucoMarkers>::SharedPtr aruco_sub_;
+  rclcpp::Subscription<arucobot_interfaces::msg::ArucoMarkers>::SharedPtr aruco_sub_;
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr img_sub_;
   sensor_msgs::msg::Image::SharedPtr last_image_msg_;
 };

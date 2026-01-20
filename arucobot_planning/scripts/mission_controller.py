@@ -37,8 +37,8 @@ class MissionController(Node):
         p = subprocess.Popen(
             ["ros2", "run", "plansys2_terminal", "plansys2_terminal"],
             stdin=subprocess.PIPE,
-            stdout=None,
-            stderr=None,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             text=True
         )
         full_input = f"{cmd_string}\nquit\n"
@@ -117,7 +117,6 @@ class MissionController(Node):
             # 3. SMART WAIT (Replaces time.sleep)
             # We wait specifically for the result of this action
             success = self.wait_for_predicate(f"(surveyed {wp})")
-            
         # =========================================
         # 2. PHASE 2: EXECUTION (Lowest ID First)
         # =========================================

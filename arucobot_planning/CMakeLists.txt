@@ -15,7 +15,7 @@ find_package(nav2_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(aruco_interfaces REQUIRED)
+find_package(arucobot_interfaces REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(tf2 REQUIRED)
@@ -43,7 +43,7 @@ ament_target_dependencies(move_action_node
   geometry_msgs
   sensor_msgs
   std_msgs
-  aruco_interfaces
+  arucobot_interfaces
   cv_bridge
   tf2
 )
