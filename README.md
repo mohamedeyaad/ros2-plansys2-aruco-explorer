@@ -119,6 +119,8 @@ ros2 run arucobot_perception aruco_detector_node
 ros2 launch arucobot_planning planning.launch.py
 
 # Terminal 4: Run automated mission controller
+# Make script executable (first time only)
+chmod +x ~/ros2_ws/src/ros2-plansys2-aruco-explorer/arucobot_planning/scripts/mission_controller.py
 ros2 run arucobot_planning mission_controller.py
 ```
 
