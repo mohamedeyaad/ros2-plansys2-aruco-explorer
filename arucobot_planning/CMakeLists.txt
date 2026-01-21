@@ -58,7 +58,7 @@ install(TARGETS
 )
 
 install(
-  DIRECTORY launch pddl config
+  DIRECTORY launch pddl
   DESTINATION share/${PROJECT_NAME}
 )
 

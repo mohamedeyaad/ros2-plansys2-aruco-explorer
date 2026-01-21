@@ -57,17 +57,17 @@ The robot operates in a known environment with **4 predefined waypoints** and di
 Ensure you have **ROS 2 Jazzy** installed with Gazebo Harmonic.
 
 ### 2. Install Dependencies
+
 ```bash
 sudo apt update
 sudo apt install ros-jazzy-navigation2 \
                  ros-jazzy-nav2-bringup \
                  ros-jazzy-slam-toolbox \
-                 ros-jazzy-plansys2-bringup \
+                 ros-jazzy-plansys2-* \
                  ros-jazzy-ros-gz-sim \
                  ros-jazzy-ros-gz-bridge \
                  ros-jazzy-cv-bridge \
-                 python3-opencv \
-                 python3-opencv-contrib
+                 python3-opencv
 ```
 
 ### 3. Clone & Build
@@ -81,6 +81,23 @@ git clone https://github.com/mohamedeyaad/ros2-plansys2-aruco-explorer.git
 cd ~/ros2_ws
 colcon build --symlink-install
 source install/setup.bash
+```
+
+### 4. ⚠️ Environment Setup (Important)
+
+For Gazebo to locate the custom ArUco marker models, you must strictly add the models directory to the `GZ_SIM_RESOURCE_PATH`.
+
+Run this command in your terminal before launching the simulation (or add it to your `~/.bashrc`):
+
+```bash
+export GZ_SIM_RESOURCE_PATH=/home/$USER/ros2_ws/src/ros2-plansys2-aruco-explorer/arucobot_gazebo/models/
+```
+
+**To persist across sessions, add to your `.bashrc`:**
+
+```bash
+echo 'export GZ_SIM_RESOURCE_PATH=/home/$USER/ros2_ws/src/ros2-plansys2-aruco-explorer/arucobot_gazebo/models/' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ---
