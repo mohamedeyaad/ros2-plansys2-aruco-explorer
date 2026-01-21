@@ -16,10 +16,10 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='mooeyad',
-    maintainer_email='mooeyad@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer='Mohamed Eyad',
+    maintainer_email='mooeyad@gmail.com',
+    description='ArUco marker detection node using OpenCV and ROS 2 camera feed integration',
+    license='Apache License 2.0',
     extras_require={
         'test': [
             'pytest',

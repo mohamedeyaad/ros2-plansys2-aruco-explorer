@@ -3,14 +3,16 @@
 <package format="3">
   <name>arucobot_gazebo</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="mooeyad@todo.todo">mooeyad</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Gazebo simulation world, ArUco marker models, and simulation integration for autonomous exploration robot</description>
+  <maintainer email="mooeyad@gmail.com">Mohamed Eyad</maintainer>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

@@ -3,9 +3,9 @@
 <package format="3">
   <name>arucobot_interfaces</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="mooeyad@todo.todo">mooeyad</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Custom message definitions for ArUco marker detection and autonomous exploration system</description>
+  <maintainer email="mooeyad@gmail.com">Mohamed Eyad</maintainer>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   
