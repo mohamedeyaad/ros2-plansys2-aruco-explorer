@@ -27,15 +27,34 @@ def generate_launch_description():
         }.items()
     )
 
-    # 3. Launch Move Action Node
-    move_action_node = Node(
+    # 3. Launch Action Executors
+    move_node = Node(
         package='arucobot_planning',
         executable='move_action_node', # Name of the executable in CMakeLists.txt
         name='move_action_node',
         output='screen',
+        parameters=[{'action_name': 'move'}]
     )
-    
+
+    survey_node = Node(
+        package='arucobot_planning',
+        executable='survey_action_node',
+        name='survey_action_node',
+        output='screen',
+        parameters=[{'action_name': 'survey'}]
+    )
+
+    pic_node = Node(
+        package='arucobot_planning',
+        executable='take_picture_action_node',
+        name='take_picture_action_node',
+        output='screen',
+        parameters=[{'action_name': 'take_picture'}]
+    )
+
     return LaunchDescription([
         plansys2_launch,
-        move_action_node
+        move_node,
+        survey_node,
+        pic_node
     ])

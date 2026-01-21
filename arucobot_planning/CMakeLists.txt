@@ -32,28 +32,46 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# 1. MOVE NODE
 add_executable(move_action_node src/move_action_node.cpp)
-
 ament_target_dependencies(move_action_node
   rclcpp
   rclcpp_action
-  rclcpp_lifecycle
   plansys2_executor
   nav2_msgs
   geometry_msgs
-  sensor_msgs
-  std_msgs
-  arucobot_interfaces
-  cv_bridge
   tf2
 )
 
-target_link_libraries(move_action_node
-  ${OpenCV_LIBRARIES}
+# 2. SURVEY NODE
+add_executable(survey_action_node src/survey_action_node.cpp)
+ament_target_dependencies(survey_action_node
+  rclcpp
+  rclcpp_action
+  plansys2_executor
+  geometry_msgs
+  std_msgs
+  arucobot_interfaces
 )
 
+# 3. PICTURE NODE
+add_executable(take_picture_action_node src/take_picture_action_node.cpp)
+ament_target_dependencies(take_picture_action_node
+  rclcpp
+  rclcpp_action
+  plansys2_executor
+  geometry_msgs
+  sensor_msgs
+  cv_bridge
+  arucobot_interfaces
+)
+target_link_libraries(take_picture_action_node ${OpenCV_LIBRARIES})
+
+# INSTALL ALL 3
 install(TARGETS
   move_action_node
+  survey_action_node
+  take_picture_action_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
