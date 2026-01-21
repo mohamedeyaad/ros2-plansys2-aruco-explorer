@@ -7,6 +7,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
@@ -62,6 +63,7 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+# Install Python scripts with proper permissions
 install(
   PROGRAMS scripts/mission_controller.py
   DESTINATION lib/${PROJECT_NAME}
