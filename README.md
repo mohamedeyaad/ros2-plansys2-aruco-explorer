@@ -7,8 +7,9 @@
 
 An autonomous mobile robot system that combines **PlanSys2 (PDDL planning)**, **Nav2 (Navigation)**, and **OpenCV (ArUco Perception)** to autonomously detect and interact with ArUco markers. The robot executes a **two-phase mission**: first surveying all predefined waypoints to discover marker locations, then systematically visiting each detected marker in ascending ID order to capture images.
 
----
+**📚 Documentation:** https://deepwiki.com/mohamedeyaad/ros2-plansys2-aruco-explorer
 
+---
 ## 🎥 Demo Video
 
 [![ROS 2 PlanSys2 ArUco Explorer Demo](https://img.youtube.com/vi/UrN_7yXdufQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=UrN_7yXdufQ)
@@ -47,7 +48,7 @@ The robot operates in a known environment with **4 predefined waypoints** and di
 | **`arucobot_perception`** | Python node for detecting ArUco markers using OpenCV and publishing detections. |
 | **`arucobot_navigation`** | Nav2 configuration (nav2_params.yaml), map files, and navigation launch scripts. |
 | **`arucobot_planning`** | PlanSys2 PDDL domain/problem files and Action Executors (move, survey, take_picture). |
-| **`aruco_interfaces`** | Custom message definitions for ArUco detections (e.g., marker ID and pose). |
+| **`arucobot_interfaces`** | Custom message definitions for ArUco detections (e.g., marker ID and pose). |
 
 ---
 
@@ -220,10 +221,8 @@ Action executors are implemented in `arucobot_planning/src/`:
 The `aruco_detector_node.py` subscribes to `/camera/image_raw`, detects ArUco markers using OpenCV, and publishes on `/aruco_markers`:
 - Detected **marker IDs** (0-3)
 - Marker **3D poses** (position and orientation)
-- **Confidence scores** for each detection
 
 ---
-
 ## 🗺️ Gazebo World
 
 The simulation includes:
@@ -242,15 +241,31 @@ The simulation includes:
 
 ---
 
-## 📁 Key Configuration Files
+## 🗺️ Environment Mapping
 
-- **Navigation**: `arucobot_navigation/config/nav2_params.yaml`
-- **PDDL Domain**: `arucobot_planning/pddl/domain.pddl`
-- **PDDL Problem**: `arucobot_planning/pddl/problem.pddl`
-- **Mission Controller**: `arucobot_planning/scripts/mission_controller.py`
-- **ArUco Detector**: `arucobot_perception/scripts/aruco_detector_node.py`
-- **Gazebo Bridge**: `arucobot_gazebo/config/ros_gz_bridge.yaml`
-- **Robot Model**: `arucobot_description/urdf/aruco_bot_diff.xacro`
+The pre-mapped environment (`maps/my_map.yaml`) was created using **SLAM Toolbox**.
+
+**Mapping procedure:**
+1. Launch the simulation: 
+   ```bash
+    ros2 launch arucobot_gazebo simulation.launch.py
+   ```
+2. In a new terminal, start SLAM: 
+   ```bash
+    ros2 launch slam_toolbox online_async_launch.py
+   ```
+3. In another terminal, launch teleop to manually drive the robot:
+   ```bash
+   ros2 run teleop_twist_keyboard teleop_twist_keyboard
+   ```
+4. Manually drive the robot around the environment to explore all areas
+5. Once mapping is complete, save the map using Nav2's map saver:
+   ```bash
+   ros2 run nav2_map_server map_saver_cli -f my_map
+   ```
+6. The generated map files (`my_map.pgm` and `my_map.yaml`) are saved to `arucobot_navigation/maps/`
+
+**Note:** The provided `my_map.yaml` is already included in the repository and pre-configured for the Gazebo world. You only need to remap if you modify the world layout or add obstacles.
 
 ---
 
