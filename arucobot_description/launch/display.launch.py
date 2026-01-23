@@ -10,7 +10,7 @@ def generate_launch_description():
     pkg_arucobot_description = get_package_share_directory('arucobot_description')
 
     # Get the path to the URDF file
-    robot_description_file = os.path.join(pkg_arucobot_description, 'urdf', 'aruco_bot_diff.xacro')
+    robot_description_file = os.path.join(pkg_arucobot_description, 'urdf', 'robot.xacro')
     # Parse the URDF file using xacro
     robot_description_config = xacro.process_file(robot_description_file)
     robot_description = {'robot_description': robot_description_config.toxml()}
@@ -35,7 +35,7 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d', os.path.join(pkg_arucobot_description, 'rviz', 'arucobot_description.rviz')],
+        arguments=['-d', os.path.join(pkg_arucobot_description, 'rviz', 'robot.rviz')],
         output='screen'
     )
 

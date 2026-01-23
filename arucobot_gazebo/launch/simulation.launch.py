@@ -16,7 +16,7 @@ def generate_launch_description():
     pkg_arucobot_gazebo = get_package_share_directory('arucobot_gazebo')
 
     # Get the path to the URDF file
-    robot_description_file = os.path.join(pkg_arucobot_description, 'urdf', 'aruco_bot_diff.xacro')
+    robot_description_file = os.path.join(pkg_arucobot_description, 'urdf', 'robot.xacro')
     # Parse the URDF file using xacro
     robot_description_config = xacro.process_file(robot_description_file)
     robot_description = {'robot_description': robot_description_config.toxml()}
@@ -55,7 +55,7 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d', os.path.join(pkg_arucobot_gazebo, 'rviz', 'arucobot_gazebo.rviz')],
+        arguments=['-d', os.path.join(pkg_arucobot_gazebo, 'rviz', 'robot.rviz')],
         parameters=[{'use_sim_time': True}],
         condition=IfCondition(LaunchConfiguration('use_rviz'))
     )
@@ -93,6 +93,16 @@ def generate_launch_description():
         }],
         output='screen'
     )
+
+    # EKF Node for state estimation
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[os.path.join(pkg_arucobot_gazebo, 'config', 'ekf.yaml'),
+                    {'use_sim_time': True}]
+    )
     
     return LaunchDescription([
         use_rviz_arg,
@@ -100,5 +110,6 @@ def generate_launch_description():
         gazebo,
         rviz,
         spawn, 
-        bridge
+        bridge,
+        ekf_node
     ])
