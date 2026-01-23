@@ -20,13 +20,4 @@ ekf_filter_node:
                    true,  true,  false,
                    false, false, true,
                    false, false, false]
-
-    # IMU CONFIG
-    # The topic you bridged from Gazebo
-    imu0: /imu
-    # We only care about orientation (yaw) and angular velocity
-    imu0_config: [false, false, false,
-                  false, false, true,
-                  false, false, false,
-                  false, false, true,
-                  true,  false, false]
+    # IMU input disabled to use odom only

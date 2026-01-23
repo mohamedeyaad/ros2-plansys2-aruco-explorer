@@ -35,7 +35,7 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d', os.path.join(pkg_arucobot_description, 'rviz', 'robot.rviz')],
+        arguments=['-d', os.path.join(pkg_arucobot_description, 'rviz', 'arucobot_description.rviz')],
         output='screen'
     )
 
