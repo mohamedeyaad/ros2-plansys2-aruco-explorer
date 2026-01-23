@@ -285,6 +285,7 @@
             <odom_publish_frequency>100</odom_publish_frequency>
             <topic>robot_vel</topic>
             <odom_topic>odom</odom_topic>
+            <child_frame_id>base_footprint</child_frame_id>
         </plugin>
 
     </gazebo>
