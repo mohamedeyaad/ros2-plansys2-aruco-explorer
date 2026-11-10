@@ -205,7 +205,7 @@ The robot operates using **three durative actions**:
 
 3. **`take_picture`**: Centers on detected marker and captures image.
    - *Duration:* 10 time units
-   - *Precondition:* Robot at waypoint `w` where a marker was `surveyed`
+   - *Precondition:* Robot at waypoint `w`
    - *Effect:* Picture `picture_taken` at waypoint `w`
 
 ### Action Executors
